@@ -84,6 +84,36 @@ function checkNewContract(tx: TransactionInput): RiskSignal | null {
 }
 
 
+//check if user have intreacted with is address or not 
+// if not then add address to the storage
+
+function checkFirstTimeInteraction(tx: TransactionInput): RiskSignal | null {
+    if (!tx.to) return null
+
+    const STORAGE_KEY = "sentinel_known_addresses"  // key for local_storage
+    const stored = localStorage.getItem(STORAGE_KEY)  //if empty returns null , if not then returns JSON
+    const knownAddresses: string[] = stored ? JSON.parse(stored) : []
+    // if store is empty -> initilize knownaddresses to null 
+    // if store is not empty then pasres and store all the values as string in knownAddresses
+
+    const normalizedTo = tx.to.toLowerCase() // to avoid dublicate copy
+
+    if (!knownAddresses.includes(normalizedTo)) {
+        //store it for next step 
+        knownAddresses.push(normalizedTo);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(knownAddresses)) //local storage only store strings so we convert address into json
+
+        return {
+            flag: RiskFlag.FIRST_TIME_INTERACTION,
+            severity: "low",
+            confidence: 0.5,
+            details: "First time interacting with this address"
+        }
+    }
+    return null
+}
+
+
 
 //MAIN_EXPORT_FUNCTION
 // P3 will provide data to this function
@@ -102,6 +132,9 @@ export function analyzeHeuristics(tx: TransactionInput): RiskSignal[] {
 
     const contractSignal = checkNewContract(tx)
     if (contractSignal) signals.push(contractSignal)
+
+    const firstTimeSignal = checkFirstTimeInteraction(tx)
+    if (firstTimeSignal) signals.push(firstTimeSignal)
 
     return signals
 }
