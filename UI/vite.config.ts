@@ -10,4 +10,16 @@ export default defineConfig({
       },
     }),
   ],
+
+  //tell vite to also build these files 
+  build: {
+    rollupOptions: {
+      input: {
+        ui: "index.html",
+        background: "extension/background.ts",
+        content: "extension/contentScript.ts",
+        injct: "extension/inject.ts"
+      }
+    }
+  }
 })
