@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "types": [
       "chrome"
     ]
@@ -11,6 +16,9 @@
     },
     {
       "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.extension.json"
     }
   ]
 }
